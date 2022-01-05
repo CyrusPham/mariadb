@@ -53,3 +53,46 @@ REVOKE ALL PRIVILEGES, GRANT OPTION FROM USERNAME;
 ```sql
 GRANT ALL PRIVILEGES ON *.* TO 'USERNAME'@'%' WITH GRANT OPTION;
 ```
+## Configure MariaDB Remote Access
+Config bind-address to: 0.0.0.0.
+On Ubuntu systems with MariaDB database server installed, its default configuration file is located at: /etc/mysql/mariadb.conf.d/50-server.cnf
+Simply run the commands below to open MariaDB configuration file.
+```bash
+sudo nano /etc/mysql/mariadb.conf.d/50-server.cnf
+```
+When the file is opened, search for a line that begins with bind-address as shown below. It default value should be 127.0.0.1.
+What you need to do is change the default value 127.0.0.1 to 0.0.0.0 as shown below:
+```init
+# this is read by the standalone daemon and embedded servers
+
+# this is only for the mysqld standalone daemon
+[mysqld]
+
+#
+# * Basic Settings
+#
+user            = mysql
+pid-file        = /var/run/mysqld/mysqld.pid
+socket          = /var/run/mysqld/mysqld.sock
+port            = 3306
+basedir         = /usr
+datadir         = /var/lib/mysql
+tmpdir          = /tmp
+lc-messages-dir = /usr/share/mysql
+skip-external-locking
+
+# Instead of skip-networking the default is now to listen only on
+# localhost which is more compatible and is not less secure.
+bind-address            = 0.0.0.0
+
+#
+# * Fine Tuning
+```
+## Open/Allow incoming firewall port on Ubuntu
+```bash
+sudo ufw allow from any to any port 3306 proto tcp
+```
+After making the change above, save the file and run the commands below to restart the server.
+```bash
+sudo systemctl restart mariadb.service
+```
